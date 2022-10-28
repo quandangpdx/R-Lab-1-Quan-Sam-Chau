@@ -23,6 +23,9 @@ load("CBdata.1_10.RData") #Loading the cherry blossom data. (this is an example 
 
 #Now write code to remove the specified column
 
+raceYear = 4
+dat.76 = data.frame(CBdata.1_10[raceYear])
+dat.76
 ```
 
 
