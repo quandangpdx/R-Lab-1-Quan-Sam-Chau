@@ -100,7 +100,22 @@ load("IPS_portion.RData")
 
 1. First apply the `summary` function to the `IPS_data` to get a sense of what is available in that data frame. 
 
+```{r}
+summary(IPS_sampledata)
+```
+
+
 2. Identify variables that need any `class` conversion. Attempting to avoid code-replication as much as possible, convert these variables into the correct class type.
+
+```{r}
+#for (num in c(time, posX, posY, posZ, orientation, signal, channel)) {
+for (num in c("time", "posX", "posY", "posZ", "orientation", "signal", "channel")) {
+  IPS_sampledata$num<-as.numeric(IPS_sampledata$num)
+}
+IPS_sampledata$type<-as.integer(IPS_sampledata$type)
+IPS_sampledata$type<-as.integer(IPS_sampledata$type)
+
+```
 
 3. Because we only want data relative to access points, remove observations that correspond to any other type of device.
 
