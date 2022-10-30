@@ -111,20 +111,35 @@ summary(IPS_sampledata)
 2. Identify variables that need any `class` conversion. Attempting to avoid code-replication as much as possible, convert these variables into the correct class type.
 
 ```{r}
-#for (num in c(time, posX, posY, posZ, orientation, signal, channel)) {
 for (num in c("time", "posX", "posY", "posZ", "orientation", "signal", "channel")) {
-  IPS_sampledata$num<-as.numeric(IPS_sampledata$num)
+  IPS_sampledata[[num]]<-as.numeric(IPS_sampledata[[num]])
 }
 IPS_sampledata$type<-as.integer(IPS_sampledata$type)
-IPS_sampledata$type<-as.integer(IPS_sampledata$type)
+
+summary(IPS_sampledata)
 
 ```
 
 3. Because we only want data relative to access points, remove observations that correspond to any other type of device.
 
+```{r}
+data <- IPS_sampledata[(IPS_sampledata$type==3),]
+```
+
+
 4. Assess if there are any variables that provide redundant or no information. If so, remove them from the data frame.
+```{r}
+# They all seem important???
+```
+
 
 5. Note that the `time` variable is in milliseconds.  Transform it into seconds and then convert its class into a time format using the function `as.POSIXct`.
+```{r}
+
+data$time <- as.POSIXct(data$time/1000, origin = "1970-01-01 00:00:00", tz = "GMT")
+
+```
+
 
 
 ### Examining the data more closely
