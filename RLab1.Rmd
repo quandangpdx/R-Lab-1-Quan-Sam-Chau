@@ -191,17 +191,22 @@ data$time <- as.POSIXct(data$time/1000, origin = "1970-01-01 00:00:00", tz = "GM
 1. Create the function `tally_mac` whose only input is the MAC address of an access point, and returns the number of observations found in the data set for it.
 
 ```{r}
+# declaring the function that requires a mac address
 tally_mac <- function(mac_address) {
 
+    # save the number of observations as the number of rows in the data
     num_observations = nrow(IPS_sampledata);
     num_observations_from_mac = 0;
 
+    # loop through each observation and see if the mac address matches up
     for ( m in 1:num_observations ) {
         if ( IPS_sampledata$mac[m] == mac_address ) {
+            # if it does, add 1 to the number of observations
             num_observations_from_mac = 1 + num_observations_from_mac;
         }
     }
 
+    # return the number of observations
     return(num_observations_from_mac);
 
 }
@@ -210,20 +215,27 @@ tally_mac <- function(mac_address) {
 2. Use the function `unique` to identify the unique levels for `mac` found in the data set.
 
 ```{r}
+# creating a list of different macs using the unique() function on the sample data
 unique_macs = unique(IPS_sampledata$mac);
 ```
 
 3. Using an approach learned in class together with `tally_mac`, tally the  number of observations for all access points in the data. While the researchers did their best to clean their data, some noise was introduced by access points on other floors.  Based on the number of counts, identify and remove likely suspects for access points read by mistake.
 
 ```{r}
+# number of unique mac address
 num_unique_macs = length(unique_macs);
+# creating an array to the observations of each mac address
 num_observations_from_mac = array();
+# the length of this array should match the number of different mac address
 length(num_observations_from_mac) = num_unique_macs;
 
+# loop through each unique mac address available
 for (m in 1:num_unique_macs) {
-
+    
+    # tally all of the addresses that match from the list of unique ones
     num_observations_from_mac[m] = tally_mac(IPS_sampledata$mac[m]);
 
+    # print all of the unique addresses along with the number of times they show up
     print(c(IPS_sampledata$mac[m],num_observations_from_mac[m]));
 }
 ```
@@ -231,13 +243,16 @@ for (m in 1:num_unique_macs) {
 4.  The orientation of the hand-held device considered was supposed to be exactly set to the 8 angles from 0-315 in increments of 45 degrees (360 is equivalent to 0). However, in practice the measured orientations were close to the 8 expected but had some error, so we'll need to group them.  Develop and apply a function to recode the orientation values as one of 0, 45, 90, 135, 180, 225, 270, 315. Call the recoded orientation variable `rec_orient`.
 
 ```{r}
+# function that takes in the angle from the data
 get_rec_orient <- function(theta) {
 
+    # recodes the orientation as a multiple of 45 degrees
     t = ( 45 * floor( as.numeric(theta)/45.0 + 0.5) ) %% 360;
     return(t);
 
 }
 
+# holds the orientation of the data
 rec_orient <- get_rec_orient(IPS_sampledata$orientation);
 ```
 
@@ -246,12 +261,19 @@ rec_orient <- get_rec_orient(IPS_sampledata$orientation);
 ```{r}
 signal_summary <- function(posX,posY,posZ,rec_orient,mac) {
 
+    # list for keeping track of observations
     index_observations = c();
+    # number of observations is the amount of data we have
     num_observations = nrow(IPS_sampledata);
 
+    # an array of the orientation
     rec_orient_array <- get_rec_orient(as.numeric(IPS_sampledata$orientation));
 
+    # go through each observation and collection the data for the
+    # xyz coordinates, as well as the orientation and mac address
+    # of the matching observation
     for ( m in 1:num_observations ) {
+        # put the data into the list of observations with these values
         if ( posX == IPS_sampledata$posX[m]
             && posY == IPS_sampledata$posY[m]
             && posZ == IPS_sampledata$posZ[m]
@@ -261,11 +283,13 @@ signal_summary <- function(posX,posY,posZ,rec_orient,mac) {
         }
     }
 
+    # gets the index observations as a numeric value
     signals = as.numeric(IPS_sampledata$signal[index_observations]);
 
     mu = mean(signals);
     sigma = sd(signals);
 
+    # returns the mean and sum of the signal
     return(c(mu,sigma));
 
 }
@@ -274,10 +298,14 @@ signal_summary <- function(posX,posY,posZ,rec_orient,mac) {
 6.  Create a list where each entry corresponds to a named list including unique combination of a location, an orientation, and an access point.  Use this list in combination with `lapply` and `signal_summary` to generate a summary of signals for each unique combination. `Hint`: you may want to create a new variable with a unique identifier that combines location, `rec_orient` and `mac` to make your life simpler.  One way to go about this is using the `paste` function (see `?paste` for help on its use) with these variables in a row-by-row fashion.
 
 ```{r}
+# number of observations is the amount of data collected
 num_observations = nrow(IPS_sampledata);
+# an array of ids that is the same length as the amount of data collected
 id = array();
 length(id) = num_observations;
 
+# pasting the xyz coordinates, orientation and mac address of each observation
+# into the id array
 for (m in 1:num_observations) {
     id[m] = paste(
         IPS_sampledata$posX[m],
@@ -288,22 +316,27 @@ for (m in 1:num_observations) {
         );
 }
 
+# creating a list of unique ids
 unique_id = unique(id);
 num_unique_id = length(unique_id);
 
+# an index of unique ids
 unique_id_idx = array();
 length(unique_id_idx) = num_unique_id;
 
+# loop through each unique id
 for (i in 1:num_unique_id) {
 
     m = 0;
     not_found = TRUE;
-
+    
+    # if we don't find the unique id, keep increasing m
     while (m <= num_observations & not_found) {
         m = m+1;
         not_found = ( unique_id[i] != id[m] );
     }
 
+    # when we find the unique id, save the index that it was at
     if (!not_found) {
         unique_id_idx[i] = m;
     } else {
@@ -312,12 +345,15 @@ for (i in 1:num_unique_id) {
     }
 }
 
+# loop through the unique ids again
 for (i in 1:num_unique_id) {
 
     m = unique_id_idx[i];
 
+    # get the orientation of at the index
     rec_orient = get_rec_orient(IPS_sampledata$orientation[m]);
 
+    # getting the info using signal summary and saving it into musigma
     musigma = signal_summary(
         IPS_sampledata$posX[m],
         IPS_sampledata$posY[m],
@@ -326,10 +362,12 @@ for (i in 1:num_unique_id) {
         IPS_sampledata$mac[m]
     );
 
+    # saving the first two elements into mu and sigma
     mu = musigma[1];
     sigma = musigma[2];
 
     # printing in R suckssssssss
+    # print the data
     print(c(
         IPS_sampledata$posX[m],
         IPS_sampledata$posY[m],
