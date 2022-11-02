@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Playing With Cherry Blossom Race Data
 
-1) First load the data, which is saved as a .RData file called `CBdata.1_10.RData`. This is the first ten years' worth of Cherry Blossom Race data. Pull out the data associated with 1976 and store it as a data frame called `dat.76`. Remove the column `Pis/Tis`. 
+1) First load the data, which is saved as a .RData file called `CBdata.1_10.RData`. This is the first ten years' worth of Cherry Blossom Race data. Pull out the data associated with 1976 and store it as a data frame called `dat.76`. Remove the column `Pis/Tis`.
 
 
 ```{r import_data}
@@ -30,16 +30,16 @@ dat.76 <- subset(dat.76, select = -c(PiS.TiS)) # Remove `Pis/Tis` column
 ```
 
 
-2) The function `summary()` is useful for learning basic facts about vectors, data frames, and many other R objects. Use this function to find the mean and median recorded ages in 1976. 
+2) The function `summary()` is useful for learning basic facts about vectors, data frames, and many other R objects. Use this function to find the mean and median recorded ages in 1976.
 
 ```{r summary}
 summary(dat.76) # Mean age=32.09, Median age = 32
 ```
 Mean age is 32.09. Median age is 32.
 
-3) You might have noticed that a number of age values are missing (i.e. `NA`). Your next goal is to write a loop that removes observations that don't have age data.  
-Hints:  
-- The `is.na()` function may be useful. Use the `?is.na` command to pull up documentation on this function. It might be helpful to play around with a toy example like `c(1,2,NA,3)` to make sure you understand this new function!  
+3) You might have noticed that a number of age values are missing (i.e. `NA`). Your next goal is to write a loop that removes observations that don't have age data.
+Hints:
+- The `is.na()` function may be useful. Use the `?is.na` command to pull up documentation on this function. It might be helpful to play around with a toy example like `c(1,2,NA,3)` to make sure you understand this new function!
 - Depending on how you write your code, you may need to negate a logical vector using `!`. Ex: `!c(TRUE, TRUE, FALSE)` is identical to `c(FALSE, FALSE, TRUE)`.
 
 ```{r filter_missing_age_loop}
@@ -55,7 +55,7 @@ for(x in 1:tabLen){ # loop through each row (observation)
 # dat.76.clean # print the cleaned data
 ```
 
- 4) Now use vectorization and the `is.na()` function to accomplish the same thing as the loop above.  
+ 4) Now use vectorization and the `is.na()` function to accomplish the same thing as the loop above.
 How to check your work: If your loop produced a data frame called "dat.76.clean" and the vectorization approach produced a data frame called `dat.76.clean2`, the `identical(dat.76.clean,dat.76.clean2)` should return `TRUE`.
 
 ```{r filter_missing_age_vectorization}
@@ -66,7 +66,7 @@ dat.76.clean2 = subset(dat.76, !is.na(Age)) # using vectorization to subet the d
 identical(dat.76.clean, dat.76.clean2) # compare two methods of cleaning NA Age
 ```
 
-5) Filtering out missing age data could be useful when dealing with other years. With this in mind, turn your filter loop or vectorization approach into a function. You should be able to use the function like this: `dat.76.clean <- filter.func(dat.76)`.  
+5) Filtering out missing age data could be useful when dealing with other years. With this in mind, turn your filter loop or vectorization approach into a function. You should be able to use the function like this: `dat.76.clean <- filter.func(dat.76)`.
 When you have a function written, run it on the 1976 data and use identical() to verify that your function and the first loop you wrote are doing the same thing.
 
 ```{r filter_func}
@@ -79,8 +79,8 @@ dat.76.clean3 = filter.func(dat.76) # apply -fulter.func- on dat.76 data
 identical(dat.76.clean3, dat.76.clean2) # gives identical results
 ```
 
-6) Next, write a loop that combines all of the data from `CBdata.1_10` into one cleaned data frame. Make sure your final data frame has neither the `Pis/Tis` column nor `NA` Age values.  
-Use the `identical()` function to verify that the 1976 data in this larger cleaned data set is the same as the cleaned version of `dat.76`. 
+6) Next, write a loop that combines all of the data from `CBdata.1_10` into one cleaned data frame. Make sure your final data frame has neither the `Pis/Tis` column nor `NA` Age values.
+Use the `identical()` function to verify that the 1976 data in this larger cleaned data set is the same as the cleaned version of `dat.76`.
 
 ```{r combine_dat}
 allData = data.frame() # Create empty data frame called `allData`
@@ -89,13 +89,13 @@ for(x in 1:length(CBdata.1_10)){ # loops over each data table in `CNdata.1_10`
   yearData = subset(yearData, select = -c(PiS.TiS)) # excluding PiS.TiS from `yearData` data frame
   yearData = filter.func(yearData) # filtering out missing Age observations
   allData = rbind(allData, yearData) # append each year data to the main `allData` data frame
-  
+
   if(x == 4){
     print(identical(yearData, dat.76.clean)) # is the 4th year data (1976) are the same with previous cleaned data set?
   }
-  
+
   if(5 < x){
-    print(summary(yearData)) # summarize data for each year after 1977 
+    print(summary(yearData)) # summarize data for each year after 1977
   }
 }
 
@@ -103,7 +103,7 @@ summary(allData) # summary of all the years
 #allData
 ```
 
-7) Now that you have the combined data set for these 10 years, let's do some basic exploration:  
+7) Now that you have the combined data set for these 10 years, let's do some basic exploration:
 a) How does the average of the recorded ages in 1976 compare to that same average over the entire `CBdata.1_10` data set?
  - the average age in 1976 is lower than the average age of the entire data set.
 
@@ -118,7 +118,7 @@ mean(allData[allData$Year>1977,"Age"]) #the average age over the last 5 years
 
 # Playing with the indoor positioning system data
 
-The `IPS_sampledata` data set contains a fraction of the indoor positioning system data for 15 randomly sampled locations.This data set is loaded into memory using the chunk of R code below, complete the following exercises. 
+The `IPS_sampledata` data set contains a fraction of the indoor positioning system data for 15 randomly sampled locations.This data set is loaded into memory using the chunk of R code below, complete the following exercises.
 
 ```{r eval=T, echo=T}
 # loads data set IPS_sampledata
@@ -145,7 +145,7 @@ load("IPS_portion.RData")
 
 ### Let's clean up the data a bit
 
-1. First apply the `summary` function to the `IPS_data` to get a sense of what is available in that data frame. 
+1. First apply the `summary` function to the `IPS_data` to get a sense of what is available in that data frame.
 
 ```{r}
 summary(IPS_sampledata)
@@ -190,12 +190,154 @@ data$time <- as.POSIXct(data$time/1000, origin = "1970-01-01 00:00:00", tz = "GM
 
 1. Create the function `tally_mac` whose only input is the MAC address of an access point, and returns the number of observations found in the data set for it.
 
-2. Use the function `unique` to identify the unique levels for `mac` found in the data set. 
+```{r}
+tally_mac <- function(mac_address) {
+
+    num_observations = nrow(IPS_sampledata);
+    num_observations_from_mac = 0;
+
+    for ( m in 1:num_observations ) {
+        if ( IPS_sampledata$mac[m] == mac_address ) {
+            num_observations_from_mac = 1 + num_observations_from_mac;
+        }
+    }
+
+    return(num_observations_from_mac);
+
+}
+```
+
+2. Use the function `unique` to identify the unique levels for `mac` found in the data set.
+
+```{r}
+unique_macs = unique(IPS_sampledata$mac);
+```
 
 3. Using an approach learned in class together with `tally_mac`, tally the  number of observations for all access points in the data. While the researchers did their best to clean their data, some noise was introduced by access points on other floors.  Based on the number of counts, identify and remove likely suspects for access points read by mistake.
 
+```{r}
+num_unique_macs = length(unique_macs);
+num_observations_from_mac = array();
+length(num_observations_from_mac) = num_unique_macs;
+
+for (m in 1:num_unique_macs) {
+
+    num_observations_from_mac[m] = tally_mac(IPS_sampledata$mac[m]);
+
+    print(c(IPS_sampledata$mac[m],num_observations_from_mac[m]));
+}
+```
+
 4.  The orientation of the hand-held device considered was supposed to be exactly set to the 8 angles from 0-315 in increments of 45 degrees (360 is equivalent to 0). However, in practice the measured orientations were close to the 8 expected but had some error, so we'll need to group them.  Develop and apply a function to recode the orientation values as one of 0, 45, 90, 135, 180, 225, 270, 315. Call the recoded orientation variable `rec_orient`.
 
-5. Create the function `signal_summary` that takes as inputs a location (`posX`, `posY`, `posZ`), an orientation (`rec_orient`) and an access point id (`mac`).  The function must identify and subset the rows in `IPS_sampledata` corresponding to this unique combination, then it must calculate and return the mean and standard deviation for the corresponding signal strengths. 
+```{r}
+get_rec_orient <- function(theta) {
+
+    t = ( 45 * floor( as.numeric(theta)/45.0 + 0.5) ) %% 360;
+    return(t);
+
+}
+
+rec_orient <- get_rec_orient(IPS_sampledata$orientation);
+```
+
+5. Create the function `signal_summary` that takes as inputs a location (`posX`, `posY`, `posZ`), an orientation (`rec_orient`) and an access point id (`mac`).  The function must identify and subset the rows in `IPS_sampledata` corresponding to this unique combination, then it must calculate and return the mean and standard deviation for the corresponding signal strengths.
+
+```{r}
+signal_summary <- function(posX,posY,posZ,rec_orient,mac) {
+
+    index_observations = c();
+    num_observations = nrow(IPS_sampledata);
+
+    rec_orient_array <- get_rec_orient(as.numeric(IPS_sampledata$orientation));
+
+    for ( m in 1:num_observations ) {
+        if ( posX == IPS_sampledata$posX[m]
+            && posY == IPS_sampledata$posY[m]
+            && posZ == IPS_sampledata$posZ[m]
+            && as.numeric(rec_orient) == rec_orient_array[m]
+            && mac == IPS_sampledata$mac[m] ) {
+                index_observations = c(index_observations,m);
+        }
+    }
+
+    signals = as.numeric(IPS_sampledata$signal[index_observations]);
+
+    mu = mean(signals);
+    sigma = sd(signals);
+
+    return(c(mu,sigma));
+
+}
+```
 
 6.  Create a list where each entry corresponds to a named list including unique combination of a location, an orientation, and an access point.  Use this list in combination with `lapply` and `signal_summary` to generate a summary of signals for each unique combination. `Hint`: you may want to create a new variable with a unique identifier that combines location, `rec_orient` and `mac` to make your life simpler.  One way to go about this is using the `paste` function (see `?paste` for help on its use) with these variables in a row-by-row fashion.
+
+```{r}
+num_observations = nrow(IPS_sampledata);
+id = array();
+length(id) = num_observations;
+
+for (m in 1:num_observations) {
+    id[m] = paste(
+        IPS_sampledata$posX[m],
+        IPS_sampledata$posY[m],
+        IPS_sampledata$posZ[m],
+        rec_orient[m],
+        IPS_sampledata$mac[m]
+        );
+}
+
+unique_id = unique(id);
+num_unique_id = length(unique_id);
+
+unique_id_idx = array();
+length(unique_id_idx) = num_unique_id;
+
+for (i in 1:num_unique_id) {
+
+    m = 0;
+    not_found = TRUE;
+
+    while (m <= num_observations & not_found) {
+        m = m+1;
+        not_found = ( unique_id[i] != id[m] );
+    }
+
+    if (!not_found) {
+        unique_id_idx[i] = m;
+    } else {
+        print("Something went wrong!");
+        stop();
+    }
+}
+
+for (i in 1:num_unique_id) {
+
+    m = unique_id_idx[i];
+
+    rec_orient = get_rec_orient(IPS_sampledata$orientation[m]);
+
+    musigma = signal_summary(
+        IPS_sampledata$posX[m],
+        IPS_sampledata$posY[m],
+        IPS_sampledata$posZ[m],
+        rec_orient,
+        IPS_sampledata$mac[m]
+    );
+
+    mu = musigma[1];
+    sigma = musigma[2];
+
+    # printing in R suckssssssss
+    print(c(
+        IPS_sampledata$posX[m],
+        IPS_sampledata$posY[m],
+        IPS_sampledata$posZ[m],
+        rec_orient,
+        IPS_sampledata$mac[m],
+        mu,
+        sigma ) );
+
+}
+```
