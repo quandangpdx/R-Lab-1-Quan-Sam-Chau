@@ -24,18 +24,18 @@ load("CBdata.1_10.RData") #Loading the cherry blossom data. (this is an example 
 #Now write code to remove the specified column
 
 raceYear = 4
-dat.76 = data.frame(CBdata.1_10[raceYear])
-subset(dat.76, select = -c(PiS.TiS))
-dat.76
+dat.76 = data.frame(CBdata.1_10[raceYear]) # Pull the 4th data table ~ 1976
+dat.76 <- subset(dat.76, select = -c(PiS.TiS)) # Remove `Pis/Tis` column
+# dat.76 # Show 1976 data
 ```
 
 
 2) The function `summary()` is useful for learning basic facts about vectors, data frames, and many other R objects. Use this function to find the mean and median recorded ages in 1976. 
 
 ```{r summary}
-summary(dat.76)
+summary(dat.76) # Mean age=32.09, Median age = 32
 ```
-
+Mean age is 32.09. Median age is 32.
 
 3) You might have noticed that a number of age values are missing (i.e. `NA`). Your next goal is to write a loop that removes observations that don't have age data.  
 Hints:  
@@ -43,72 +43,78 @@ Hints:
 - Depending on how you write your code, you may need to negate a logical vector using `!`. Ex: `!c(TRUE, TRUE, FALSE)` is identical to `c(FALSE, FALSE, TRUE)`.
 
 ```{r filter_missing_age_loop}
-dat.76.clean = dat.76
-tabLen = nrow(dat.76.clean)
+dat.76.clean = dat.76 # make a copy of the 1976 data
+tabLen = nrow(dat.76.clean) # extract the number of observations
 
-for(x in 1:tabLen){
-  if(is.na(dat.76[(tabLen+1) - x, 3]) == TRUE){
-    dat.76.clean = dat.76.clean[-((tabLen+1) -x), ]
+for(x in 1:tabLen){ # loop through each row (observation)
+  if(is.na(dat.76[(tabLen+1) - x, 3]) == TRUE){ # from bottom-up (to avoid messing up the row index after deletion), if the 3rd col (Age) at row xth is NA
+    dat.76.clean = dat.76.clean[-((tabLen+1) -x), ] # then drop the xth row
   }
 }
 
-dat.76.clean
+# dat.76.clean # print the cleaned data
 ```
 
  4) Now use vectorization and the `is.na()` function to accomplish the same thing as the loop above.  
 How to check your work: If your loop produced a data frame called "dat.76.clean" and the vectorization approach produced a data frame called `dat.76.clean2`, the `identical(dat.76.clean,dat.76.clean2)` should return `TRUE`.
 
 ```{r filter_missing_age_vectorization}
-dat.76.clean2 = dat.76
-dat.76.clean2 = subset(dat.76, !is.na(Age))
-dat.76.clean2
+dat.76.clean2 = dat.76 # create the 2nd copy of 1976 data
+dat.76.clean2 = subset(dat.76, !is.na(Age)) # using vectorization to subet the data that don't have `NR` Age)
+# dat.76.clean2
 
-identical(dat.76.clean, dat.76.clean2)
+identical(dat.76.clean, dat.76.clean2) # compare two methods of cleaning NA Age
 ```
 
 5) Filtering out missing age data could be useful when dealing with other years. With this in mind, turn your filter loop or vectorization approach into a function. You should be able to use the function like this: `dat.76.clean <- filter.func(dat.76)`.  
 When you have a function written, run it on the 1976 data and use identical() to verify that your function and the first loop you wrote are doing the same thing.
 
 ```{r filter_func}
-filter.func = function(data){
+filter.func = function(data){ # write function to clean Age using `data` input for the -subset()- function.
   cleanData = data
-  cleanData = subset(data, !is.na(Age))
+  cleanData = subset(data, !is.na(Age)) # filter out `NA` Age
 }
 
-dat.76.clean3 = filter.func(dat.76)
-identical(dat.76.clean3, dat.76.clean2)
+dat.76.clean3 = filter.func(dat.76) # apply -fulter.func- on dat.76 data
+identical(dat.76.clean3, dat.76.clean2) # gives identical results
 ```
 
 6) Next, write a loop that combines all of the data from `CBdata.1_10` into one cleaned data frame. Make sure your final data frame has neither the `Pis/Tis` column nor `NA` Age values.  
 Use the `identical()` function to verify that the 1976 data in this larger cleaned data set is the same as the cleaned version of `dat.76`. 
 
 ```{r combine_dat}
-allData = data.frame()
-for(x in 1:length(CBdata.1_10)){
-  yearData = data.frame(CBdata.1_10[x])
-  subset(yearData, select = -c(PiS.TiS))
-  yearData = filter.func(yearData)
-  allData = rbind(allData, yearData)
+allData = data.frame() # Create empty data frame called `allData`
+for(x in 1:length(CBdata.1_10)){ # loops over each data table in `CNdata.1_10`
+  yearData = data.frame(CBdata.1_10[x]) # create `yearData` data frame as a copy of each table in CBdata.1_10 list
+  yearData = subset(yearData, select = -c(PiS.TiS)) # excluding PiS.TiS from `yearData` data frame
+  yearData = filter.func(yearData) # filtering out missing Age observations
+  allData = rbind(allData, yearData) # append each year data to the main `allData` data frame
   
   if(x == 4){
-    print(identical(yearData, dat.76.clean))
+    print(identical(yearData, dat.76.clean)) # is the 4th year data (1976) are the same with previous cleaned data set?
   }
   
   if(5 < x){
-    print(summary(yearData))
+    print(summary(yearData)) # summarize data for each year after 1977 
   }
 }
 
-summary(allData)
-allData
+summary(allData) # summary of all the years
+#allData
 ```
 
 7) Now that you have the combined data set for these 10 years, let's do some basic exploration:  
 a) How does the average of the recorded ages in 1976 compare to that same average over the entire `CBdata.1_10` data set?
- - the average age overall went up
+ - the average age in 1976 is lower than the average age of the entire data set.
 
 b) Recall that the `CBdata.1_10` contains the first ten year's worth of cherry blossom race data. How does the average participant age over the first five years compare to the average age over years 6-10?
- - the average age went from an average of 31.89 to 34.88
+```{r}
+mean(allData[allData$Year<=1977,"Age"]) #the average age over the first 5 years
+mean(allData[allData$Year>1977,"Age"]) #the average age over the last 5 years
+
+```
+
+ - the average age went from an average of 31.12 to 33.69
 
 # Playing with the indoor positioning system data
 
