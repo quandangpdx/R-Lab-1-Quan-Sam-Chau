@@ -148,6 +148,7 @@ load("IPS_portion.RData")
 1. First apply the `summary` function to the `IPS_data` to get a sense of what is available in that data frame.
 
 ```{r}
+# display summary of data
 summary(IPS_sampledata)
 ```
 
@@ -155,6 +156,7 @@ summary(IPS_sampledata)
 2. Identify variables that need any `class` conversion. Attempting to avoid code-replication as much as possible, convert these variables into the correct class type.
 
 ```{r}
+# for each variable that should be numeric, change type to numeric
 for (num in c("time", "posX", "posY", "posZ", "orientation", "signal", "channel")) {
   IPS_sampledata[[num]]<-as.numeric(IPS_sampledata[[num]])
 }
@@ -167,6 +169,7 @@ summary(IPS_sampledata)
 3. Because we only want data relative to access points, remove observations that correspond to any other type of device.
 
 ```{r}
+# remove observations not taken from access points
 data <- IPS_sampledata[(IPS_sampledata$type==3),]
 ```
 
@@ -180,7 +183,7 @@ data <- subset(data, select = -c(scanMac, type))
 
 5. Note that the `time` variable is in milliseconds.  Transform it into seconds and then convert its class into a time format using the function `as.POSIXct`.
 ```{r}
-
+# convert 'time' variable to time format
 data$time <- as.POSIXct(data$time/1000, origin = "1970-01-01 00:00:00", tz = "GMT")
 
 ```
@@ -232,7 +235,7 @@ length(num_observations_from_mac) = num_unique_macs;
 
 # loop through each unique mac address available
 for (m in 1:num_unique_macs) {
-    
+
     # tally all of the addresses that match from the list of unique ones
     num_observations_from_mac[m] = tally_mac(IPS_sampledata$mac[m]);
 
@@ -330,7 +333,7 @@ for (i in 1:num_unique_id) {
 
     m = 0;
     not_found = TRUE;
-    
+
     # if we don't find the unique id, keep increasing m
     while (m <= num_observations & not_found) {
         m = m+1;
