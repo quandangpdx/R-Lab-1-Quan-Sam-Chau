@@ -173,7 +173,8 @@ data <- IPS_sampledata[(IPS_sampledata$type==3),]
 
 4. Assess if there are any variables that provide redundant or no information. If so, remove them from the data frame.
 ```{r}
-# They all seem important???
+# Type and scanMac to be removed
+data <- subset(data, select = -c(scanMac, type))
 ```
 
 
